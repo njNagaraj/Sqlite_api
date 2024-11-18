@@ -9,12 +9,16 @@ app.use(express.json());
 
 // Route to get all players
 app.get('/players', (req, res) => {
-    db.all('SELECT * FROM players', [], (err, rows) => {
+    const page = parseInt(req.query.page) || 1; // default to page 1
+    const pageSize = parseInt(req.query.pageSize) || 100; // default to 100 rows per page
+    const offset = (page - 1) * pageSize; // Calculate offset based on page number
+
+    db.all('SELECT * FROM players LIMIT ? OFFSET ?', [pageSize, offset], (err, rows) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ error: err.message });
         }
-        res.json(rows);  // Send the players data as JSON response
+        res.json(rows); 
     });
 });
 
